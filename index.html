@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Japanese Study</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --accent: #ff6b6b;
+            --accent-light: #ffe0e0;
+            --correct: #51cf66;
+            --border: #e9ecef;
+            --shadow: rgba(0, 0, 0, 0.08);
+        }
+
+        body.dark-mode {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --bg-card: #2a2a2a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent: #ff8787;
+            --accent-light: #3d2020;
+            --correct: #69db7c;
+            --border: #333333;
+            --shadow: rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-bottom: 80px;
+            transition: background 0.3s ease;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px;
+            z-index: 100;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .week-selector {
+            flex: 1;
+        }
+
+        .week-selector select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .delete-week-btn {
+            background: #ff4444;
+            border: 2px solid #cc0000;
+            border-radius: 12px;
+            padding: 10px 16px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: none;
+        }
+
+        .delete-week-btn.visible {
+            display: block;
+        }
+
+        .delete-week-btn:active {
+            transform: scale(0.95);
+            background: #cc0000;
+        }
+
+        .icon-btn {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            font-size: 20px;
+            min-width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:active {
+            transform: scale(0.95);
+            background: var(--bg-secondary);
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 65px;
+            z-index: 99;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .tab-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* Content */
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 16px;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Patterns Section (Priority #1) */
+        .patterns-section {
+            background: linear-gradient(135deg, var(--accent) 0%, #fa5252 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .patterns-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .patterns-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .advice-text {
+            font-size: 16px;
+            line-height: 1.8;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .common-mistake {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-size: 15px;
+            line-height: 1.7;
+            border-left: 4px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .common-mistake:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Practice Section */
+        .practice-section {
+            margin-top: 32px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card-counter {
+            font-size: 14px;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        /* Swipeable Card */
+        .card-container {
+            position: relative;
+            min-height: 400px;
+            perspective: 1000px;
+        }
+
+        .practice-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 32px 24px;
+            box-shadow: 0 8px 24px var(--shadow);
+            min-height: 380px;
+            display: flex;
+            flex-direction: column;
+            touch-action: pan-y;
+            transition: transform 0.3s ease;
+            border: 2px solid var(--border);
+        }
+
+        .card-type {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .card-incorrect {
+            font-size: 20px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            padding: 16px;
+            background: var(--accent-light);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .card-correct {
+            font-size: 20px;
+            line-height: 1.6;
+            color: var(--correct);
+            font-weight: 600;
+            padding: 16px;
+            background: color-mix(in srgb, var(--correct) 10%, transparent);
+            border-radius: 12px;
+            border-left: 4px solid var(--correct);
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .card-correct.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-reason {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease 0.1s;
+        }
+
+        .card-reason.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-hint {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 16px;
+            font-style: italic;
+        }
+
+        /* Navigation */
+        .card-nav {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn.prev {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .nav-btn.next {
+            background: var(--accent);
+            color: white;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .nav-btn:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+
+        /* Add Week Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .modal-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .paste-area {
+            width: 100%;
+            min-height: 200px;
+            padding: 16px;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 16px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .modal-btn.cancel {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+        }
+
+        .modal-btn.save {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .empty-text {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .add-first-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--border);
+            z-index: 100;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* Success Message */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--accent);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 16px var(--shadow);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="week-selector">
+                <select id="weekSelector">
+                    <option value="">Select a week...</option>
+                </select>
+            </div>
+            <div class="header-controls">
+                <button class="delete-week-btn" id="deleteWeekBtn" onclick="deleteCurrentWeek()">🗑️ Delete</button>
+                <button class="icon-btn" id="addWeekBtn" title="Add Week">➕</button>
+                <button class="icon-btn" id="darkModeBtn" title="Dark Mode">🌙</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav" id="tabNav" style="display: none;">
+        <button class="tab-btn active" data-tab="all" onclick="switchTab('all')">
+            📚 All
+        </button>
+        <button class="tab-btn" data-tab="patterns" onclick="switchTab('patterns')">
+            🎯 Patterns
+        </button>
+        <button class="tab-btn" data-tab="practice" onclick="switchTab('practice')">
+            🎴 Practice
+        </button>
+    </div>
+
+    <!-- Content -->
+    <div class="content" id="mainContent">
+        <!-- Empty state or week content will go here -->
+    </div>
+
+    <!-- Add Week Modal -->
+    <div class="modal" id="addWeekModal">
+        <div class="modal-content">
+            <div class="modal-header">📝 Add New Week</div>
+            <div class="modal-subtitle">
+                <strong>How to add your week:</strong><br>
+                1. In Google Sheets, select ALL the data (from お題 to the last common mistake)<br>
+                2. Copy it (Cmd+C or Ctrl+C)<br>
+                3. Paste below and click "Add Week"<br>
+                <br>
+                💡 Make sure to copy the entire table including the section headers (【単語】, 【文章】, etc.)
+            </div>
+            <textarea class="paste-area" id="pasteArea" placeholder="Paste your Google Sheets data here...&#10;&#10;Example:&#10;【お題】新しい事に挑戦するのならば…について 1/16&#10;【単語】【文章】&#10;..."></textarea>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeAddWeekModal()">Cancel</button>
+                <button class="modal-btn save" onclick="saveNewWeek()">Add Week</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <script>
+        // App State
+        let weeks = [];
+        let currentWeek = null;
+        let currentCardIndex = 0;
+        let isRevealed = false;
+        let allCards = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadWeeksFromStorage();
+            setupEventListeners();
+            loadPreferences();
+            renderApp();
+        });
+
+        // Load weeks from localStorage
+        function loadWeeksFromStorage() {
+            const stored = localStorage.getItem('japaneseStudyWeeks');
+            if (stored) {
+                try {
+                    weeks = JSON.parse(stored);
+                } catch (e) {
+                    console.error('Error loading weeks:', e);
+                    weeks = [];
+                }
+            }
+        }
+
+        // Save weeks to localStorage
+        function saveWeeksToStorage() {
+            localStorage.setItem('japaneseStudyWeeks', JSON.stringify(weeks));
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('weekSelector').addEventListener('change', (e) => {
+                if (e.target.value !== '') {
+                    loadWeek(parseInt(e.target.value));
+                    document.getElementById('deleteWeekBtn').classList.add('visible');
+                } else {
+                    document.getElementById('deleteWeekBtn').classList.remove('visible');
+                }
+            });
+
+            document.getElementById('addWeekBtn').addEventListener('click', openAddWeekModal);
+            
+            document.getElementById('darkModeBtn').addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                localStorage.setItem('darkMode', isDark);
+                document.getElementById('darkModeBtn').textContent = isDark ? '☀️' : '🌙';
+            });
+
+            // Close modal on background click
+            document.getElementById('addWeekModal').addEventListener('click', (e) => {
+                if (e.target.id === 'addWeekModal') {
+                    closeAddWeekModal();
+                }
+            });
+        }
+
+        // Delete current week
+        function deleteCurrentWeek() {
+            if (!currentWeek) return;
+
+            const weekIndex = parseInt(document.getElementById('weekSelector').value);
+            const weekTitle = weeks[weekIndex].title;
+
+            if (confirm(`Are you sure you want to delete "${weekTitle}"?\n\nThis cannot be undone.`)) {
+                weeks.splice(weekIndex, 1);
+                saveWeeksToStorage();
+                currentWeek = null;
+                showToast('Week deleted');
+                renderApp();
+            }
+        }
+
+        // Load preferences
+        function loadPreferences() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeBtn').textContent = '☀️';
+            }
+        }
+
+        // Render app
+        function renderApp() {
+            const selector = document.getElementById('weekSelector');
+            selector.innerHTML = '<option value="">Select a week...</option>';
+            
+            weeks.forEach((week, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = week.title;
+                selector.appendChild(option);
+            });
+
+            if (weeks.length === 0) {
+                renderEmptyState();
+            } else if (currentWeek === null) {
+                // Auto-load most recent week
+                selector.value = 0;
+                loadWeek(0);
+            }
+        }
+
+        // Render empty state
+        function renderEmptyState() {
+            const content = document.getElementById('mainContent');
+            document.getElementById('tabNav').style.display = 'none';
+            content.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📚</div>
+                    <div class="empty-title">Welcome to Your Japanese Study App!</div>
+                    <div class="empty-text">
+                        Get started by adding your first week of lessons.<br>
+                        Just copy your feedback from Google Sheets and paste it here.
+                    </div>
+                    <button class="add-first-btn" onclick="openAddWeekModal()">
+                        ➕ Add Your First Week
+                    </button>
+                </div>
+            `;
+        }
+
+        // Load week
+        function loadWeek(weekIndex) {
+            currentWeek = weeks[weekIndex];
+            currentCardIndex = 0;
+            isRevealed = false;
+
+            // Prepare cards
+            allCards = [];
+            if (currentWeek.vocabulary) {
+                currentWeek.vocabulary.forEach(item => {
+                    allCards.push({ type: 'vocabulary', ...item });
+                });
+            }
+            if (currentWeek.sentences) {
+                currentWeek.sentences.forEach(item => {
+                    allCards.push({ type: 'sentence', ...item });
+                });
+            }
+
+            renderWeekView();
+        }
+
+        // Render week view
+        function renderWeekView() {
+            const content = document.getElementById('mainContent');
+            document.getElementById('tabNav').style.display = 'flex';
+            
+            let html = '';
+
+            // All Tab Content
+            html += `<div class="content-section active" id="allContent">`;
+            html += renderPatternsSection();
+            html += renderPracticeSection();
+            html += `</div>`;
+
+            // Patterns Tab Content
+            html += `<div class="content-section" id="patternsContent">`;
+            html += renderPatternsSection();
+            html += `</div>`;
+
+            // Practice Tab Content
+            html += `<div class="content-section" id="practiceContent">`;
+            html += renderPracticeSection();
+            html += `</div>`;
+
+            content.innerHTML = html;
+            updateProgress();
+        }
+
+        // Render patterns section
+        function renderPatternsSection() {
+            let html = `
+                <div class="patterns-section">
+                    <div class="patterns-title">
+                        🎯 This Week's Patterns
+                    </div>
+                    <div class="patterns-subtitle">
+                        Focus on these to improve your Japanese
+                    </div>
+            `;
+
+            if (currentWeek.advice) {
+                html += `<div class="advice-text"><strong>Teacher's Advice:</strong><br>${currentWeek.advice}</div>`;
+            }
+
+            if (currentWeek.commonMistakes && currentWeek.commonMistakes.length > 0) {
+                currentWeek.commonMistakes.forEach(mistake => {
+                    html += `<div class="common-mistake">⚠️ ${mistake}</div>`;
+                });
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        // Render practice section
+        function renderPracticeSection() {
+            if (allCards.length === 0) {
+                return `
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <div class="empty-title">No practice items for this week</div>
+                        <div class="empty-text">This week only has patterns and advice.</div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="practice-section">
+                    <div class="section-header">
+                        <div class="section-title">📝 Practice</div>
+                        <div class="card-counter">${currentCardIndex + 1} / ${allCards.length}</div>
+                    </div>
+                    <div class="card-container" id="cardContainer">
+                        ${renderCard()}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Switch tabs
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+
+            // Update content sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            if (tab === 'all') {
+                document.getElementById('allContent').classList.add('active');
+            } else if (tab === 'patterns') {
+                document.getElementById('patternsContent').classList.add('active');
+            } else if (tab === 'practice') {
+                document.getElementById('practiceContent').classList.add('active');
+            }
+        }
+
+        // Render single card
+        function renderCard() {
+            const card = allCards[currentCardIndex];
+            const typeLabel = card.type === 'vocabulary' ? '📚 Vocabulary' : '💬 Expression';
+            const hasReason = card.reason && card.reason.trim().length > 0;
+
+            return `
+                <div class="practice-card" onclick="revealCard()">
+                    <div class="card-type">${typeLabel}</div>
+                    <div class="card-content">
+                        <div class="card-incorrect">${card.incorrect}</div>
+                        <div class="card-correct ${isRevealed ? 'revealed' : ''}">${card.correct}</div>
+                        ${hasReason ? `<div class="card-reason ${isRevealed ? 'revealed' : ''}">💡 ${card.reason}</div>` : ''}
+                    </div>
+                    <div class="card-hint">${isRevealed ? 'Swipe or tap Next →' : 'Tap to reveal ✨'}</div>
+                </div>
+                <div class="card-nav">
+                    <button class="nav-btn prev" onclick="event.stopPropagation(); previousCard()" ${currentCardIndex === 0 ? 'disabled' : ''}>
+                        ← Back
+                    </button>
+                    <button class="nav-btn next" onclick="event.stopPropagation(); nextCard()" ${!isRevealed ? 'disabled' : ''}>
+                        ${currentCardIndex === allCards.length - 1 ? '✓ Done' : 'Next →'}
+                    </button>
+                </div>
+            `;
+        }
+
+        // Reveal card
+        function revealCard() {
+            if (!isRevealed) {
+                isRevealed = true;
+                const containers = document.querySelectorAll('#cardContainer');
+                containers.forEach(container => {
+                    container.innerHTML = renderCard();
+                });
+                updateProgress();
+            }
+        }
+
+        // Next card
+        function nextCard() {
+            if (!isRevealed) return;
+
+            if (currentCardIndex < allCards.length - 1) {
+                currentCardIndex++;
+                isRevealed = false;
+                const containers = document.querySelectorAll('#cardContainer');
+                containers.forEach(container => {
+                    container.innerHTML = renderCard();
+                });
+                updateProgress();
+            } else {
+                showToast('Great job! 🎉 Week completed!');
+                setTimeout(() => {
+                    currentCardIndex = 0;
+                    isRevealed = false;
+                    const containers = document.querySelectorAll('#cardContainer');
+                    containers.forEach(container => {
+                        container.innerHTML = renderCard();
+                    });
+                    updateProgress();
+                }, 1500);
+            }
+        }
+
+        // Previous card
+        function previousCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                isRevealed = false;
+                const containers = document.querySelectorAll('#cardContainer');
+                containers.forEach(container => {
+                    container.innerHTML = renderCard();
+                });
+                updateProgress();
+            }
+        }
+
+        // Update progress
+        function updateProgress() {
+            const fill = document.getElementById('progressFill');
+            if (allCards.length > 0) {
+                const progress = ((currentCardIndex + 1) / allCards.length) * 100;
+                fill.style.width = `${progress}%`;
+            }
+        }
+
+        // Open add week modal
+        function openAddWeekModal() {
+            document.getElementById('addWeekModal').classList.add('active');
+            document.getElementById('pasteArea').value = '';
+        }
+
+        // Close add week modal
+        function closeAddWeekModal() {
+            document.getElementById('addWeekModal').classList.remove('active');
+        }
+
+        // Parse pasted data - Updated to handle parallel vocab and sentences
+        function parsePastedData(text) {
+            const week = {
+                vocabulary: [],
+                sentences: [],
+                advice: '',
+                commonMistakes: [],
+                title: '',
+                date: ''
+            };
+
+            // Split into lines
+            const lines = text.split('\n').filter(l => l.trim().length > 0);
+            
+            let currentSection = null;
+            let inDataRows = false;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                
+                // Check for section headers
+                if (line.includes('【お題】')) {
+                    const titleMatch = line.match(/【お題】(.+?)\s+(\d+\/\d+)/);
+                    if (titleMatch) {
+                        week.title = `${titleMatch[2]} - ${titleMatch[1]}`;
+                        week.date = titleMatch[2];
+                    }
+                    continue;
+                }
+                
+                if (line.includes('【単語】') && line.includes('【文章】')) {
+                    // Both headers on same line - vocab and sentences are parallel
+                    currentSection = 'both';
+                    i++; // Skip the header row (間違い/訂正)
+                    inDataRows = true;
+                    continue;
+                }
+                
+                if (line.includes('【一言アドバイス')) {
+                    currentSection = 'advice';
+                    inDataRows = false;
+                    continue;
+                }
+                
+                if (line.includes('【よく間違える')) {
+                    currentSection = 'mistakes';
+                    inDataRows = false;
+                    continue;
+                }
+                
+                // Skip header rows
+                if (line.includes('間違い') && line.includes('訂正')) {
+                    continue;
+                }
+                
+                // Parse based on current section
+                if (currentSection === 'both' && inDataRows) {
+                    // When vocab and sentences are side-by-side, each line has both
+                    // Split by tabs to get all columns
+                    const parts = line.split('\t');
+                    
+                    // Vocab should be in early columns (B, C = index 1, 2 if A is empty)
+                    // Sentences should be in later columns (F, G, H = index 5, 6, 7 if starting from A)
+                    
+                    let vocabIncorrect = '';
+                    let vocabCorrect = '';
+                    let sentIncorrect = '';
+                    let sentCorrect = '';
+                    let sentReason = '';
+                    
+                    // Try to find vocab pair (first two non-empty values)
+                    let foundFirst = false;
+                    for (let j = 0; j < Math.min(parts.length, 5); j++) {
+                        const part = parts[j].trim();
+                        if (part && !foundFirst) {
+                            vocabIncorrect = part;
+                            foundFirst = true;
+                        } else if (part && foundFirst && !vocabCorrect) {
+                            vocabCorrect = part;
+                            break;
+                        }
+                    }
+                    
+                    // Try to find sentence triple (should be after column E/index 4)
+                    let sentCount = 0;
+                    for (let j = 4; j < parts.length; j++) {
+                        const part = parts[j].trim();
+                        if (part) {
+                            if (sentCount === 0) {
+                                sentIncorrect = part;
+                                sentCount++;
+                            } else if (sentCount === 1) {
+                                sentCorrect = part;
+                                sentCount++;
+                            } else if (sentCount === 2) {
+                                sentReason = part;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Add vocab if found
+                    if (vocabIncorrect && vocabCorrect) {
+                        week.vocabulary.push({
+                            incorrect: vocabIncorrect,
+                            correct: vocabCorrect,
+                            reason: ''
+                        });
+                    }
+                    
+                    // Add sentence if found
+                    if (sentIncorrect && sentCorrect) {
+                        week.sentences.push({
+                            incorrect: sentIncorrect,
+                            correct: sentCorrect,
+                            reason: sentReason || ''
+                        });
+                    }
+                    
+                } else if (currentSection === 'advice') {
+                    // Advice section - just accumulate text
+                    const cleanLine = line.replace(/⁂/g, '').trim();
+                    if (cleanLine && !cleanLine.includes('【')) {
+                        week.advice += (week.advice ? ' ' : '') + cleanLine;
+                    }
+                } else if (currentSection === 'mistakes') {
+                    // Common mistakes section
+                    const cleanLine = line.replace(/⁂/g, '').trim();
+                    if (cleanLine && cleanLine.length > 10 && !cleanLine.includes('【')) {
+                        // Remove leading bullet if present
+                        const mistake = cleanLine.startsWith('・') ? cleanLine.substring(1).trim() : cleanLine;
+                        if (mistake.length > 10) {
+                            week.commonMistakes.push(mistake);
+                        }
+                    }
+                }
+            }
+            
+            // Generate title if not found
+            if (!week.title) {
+                const now = new Date();
+                week.title = `${now.getMonth()+1}/${now.getDate()}`;
+                week.date = week.title;
+            }
+            
+            return week;
+        }
+
+        // Save new week
+        function saveNewWeek() {
+            const text = document.getElementById('pasteArea').value;
+            
+            if (!text.trim()) {
+                showToast('Please paste your Google Sheets data first!');
+                return;
+            }
+
+            try {
+                const newWeek = parsePastedData(text);
+                
+                // Debug: log the parsed week
+                console.log('Parsed week:', newWeek);
+                console.log('Vocabulary count:', newWeek.vocabulary.length);
+                console.log('Sentences count:', newWeek.sentences.length);
+                
+                weeks.unshift(newWeek); // Add to beginning
+                saveWeeksToStorage();
+                closeAddWeekModal();
+                showToast('Week added successfully! 🎉');
+                renderApp();
+                
+                // Auto-load the new week
+                document.getElementById('weekSelector').value = 0;
+                loadWeek(0);
+            } catch (error) {
+                console.error('Parse error:', error);
+                showToast('Error parsing data. Please check the format.');
+            }
+        }
+
+        // Show toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Touch gestures for swipe
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (!currentWeek || !isRevealed) return;
+            
+            const swipeThreshold = 100;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swipe left - next
+                    nextCard();
+                } else {
+                    // Swipe right - previous
+                    previousCard();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
